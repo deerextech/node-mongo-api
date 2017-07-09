@@ -8,7 +8,7 @@ const {ObjectID} = require('mongodb');
 
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
-var {User} = require('./models/user-model');
+var {User} = require('./models/user');
 
 
 // mongoose.connect('mongodb://localhost:27017/TodoList');
@@ -29,6 +29,7 @@ app.post('/todos', (req,res)=>{
     res.status(400).send(e);
   })
 });
+
 app.get('/todos', (req, res) =>{
   Todo.find().then((todos)=>{
     res.send({
@@ -97,6 +98,7 @@ app.patch('/todos/:id', (req,res)=>{
     body.completed = false;
     body.completedAt = null;
   }
+
   Todo.findByIdAndUpdate(id,{$set:body},{new: true}).then((todo)=>{
     if(!todo){
       return res.status(404).send();
@@ -105,7 +107,37 @@ app.patch('/todos/:id', (req,res)=>{
   }).catch((e)=>{
     res.status(400).sned();
   })
-})
+});
+
+app.post('/users', (req,res)=>{
+  //using lodash .pick method.
+  var body = _.pick(req.body, ['username', 'email', 'password']);
+  var user = new User(body);
+
+  user.save().then(()=>{
+    return user.generateAuthToken();
+    //gets returned promise from userjs methods.generateAuthToken
+    //so it can chain
+  }).then((token)=>{
+    //now we have user and token.
+    res.header('x-auth', token).send(user);
+  })
+  .catch((e)=>{
+    res.status(400).send(e);
+  })
+});
+
+// app.get('/users', (req, res) =>{
+//   User.find().then((users)=>{
+//     res.send({
+//       users
+//     })
+//   }, (e)=>{
+//     res.status(400).send(e);
+//   })
+// });
+
+
 
 app.listen(port, ()=>{
   console.log(`started on port:${port}`);

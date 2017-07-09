@@ -1,5 +1,5 @@
 {
-  "_comment":"added a SET for node environment for all my windows hommies.",
+  "_comment": "added a SET for node environment for all my windows hommies.",
   "name": "node-mongo-api",
   "version": "1.0.0",
   "description": "",
@@ -21,10 +21,13 @@
   "homepage": "https://github.com/deerextech/node-mongo-api#readme",
   "dependencies": {
     "body-parser": "^1.15.2",
+    "crypto-js": "^3.1.9-1",
     "express": "^4.14.0",
+    "jsonwebtoken": "^7.4.1",
     "lodash": "^4.15.0",
     "mongodb": "^2.2.5",
-    "mongoose": "^4.5.9"
+    "mongoose": "^4.5.9",
+    "validator": "^8.0.0"
   },
   "devDependencies": {
     "expect": "^1.20.2",
