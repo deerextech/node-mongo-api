@@ -2,6 +2,10 @@ const {mongoose} = require('../db/mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
+
+//Time to make some middleware for pass hashing & salting.
+//http://mongoosejs.com/docs/middleware.html
 
 var UserSchema = new mongoose.Schema({
   username:{
@@ -79,7 +83,7 @@ UserSchema.statics.findByToken = function(token){
   }catch(e){
     //if verify fails.
     return Promise.reject();
-    //vv equiv of writing it like this: 
+    //vv equiv of writing it like this:
     // return new Promise((resolve,reject)=>{
     //   reject(); //server will reject promise
     // })
@@ -92,6 +96,23 @@ UserSchema.statics.findByToken = function(token){
  })
  //find associated user. Returns promise, and we return that promise.
 }
+
+//salt & hashes password before document is saved.
+//don't forget next argument!!
+UserSchema.pre('save', function(next){
+  var user = this;
+  if(user.isModified('password')){
+    bcrypt.genSalt(10,(err,salt)=>{
+      //salt the snaaail.
+      bcrypt.hash(user.password,salt,(err,hash)=>{
+        user.password = hash;
+        next();
+      })
+    })
+    //returns bool.
+
+  }else{next();}
+});
 
 var User = mongoose.model('User', UserSchema);
 
