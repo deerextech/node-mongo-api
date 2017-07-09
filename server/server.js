@@ -1,3 +1,5 @@
+var {env} = require('./config/config');
+
 const _ = require('lodash');
 
 const express = require('express');
@@ -12,7 +14,7 @@ var {User} = require('./models/user-model');
 // mongoose.connect('mongodb://localhost:27017/TodoList');
 
 var app = express();
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || env;
 
 app.use(bodyParser.json());
 
