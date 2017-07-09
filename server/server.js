@@ -127,22 +127,34 @@ app.post('/users', (req,res)=>{
   })
 });
 
-
 //making private route
 app.get('/users/me', authenticate, (req,res)=>{
   res.send(req.user);
 })
 
-// app.get('/users', (req, res) =>{
-//   User.find().then((users)=>{
-//     res.send({
-//       users
-//     })
-//   }, (e)=>{
-//     res.status(400).send(e);
-//   })
-// });
+app.get('/users', (req, res) =>{
+  User.find().then((users)=>{
+    res.send({
+      users
+    })
+  }, (e)=>{
+    res.status(400).send(e);
+  })
+});
 
+// POST /users/login
+// POST /users/login {email, password}
+app.post('/users/login', (req, res) => {
+  var body = _.pick(req.body, ['username','email', 'password']);
+
+  User.findByCredentials(body.username,body.email, body.password).then((user) => {
+    return user.generateAuthToken().then((token) => {
+      res.header('x-auth', token).send(user);
+    });
+  }).catch((e) => {
+    res.status(400).send();
+  });
+});
 
 
 app.listen(port, ()=>{

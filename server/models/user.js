@@ -97,6 +97,26 @@ UserSchema.statics.findByToken = function(token){
  //find associated user. Returns promise, and we return that promise.
 }
 
+
+UserSchema.statics.findByCredentials = function(username, email, password){
+    var User = this;
+
+    return User.findOne({username, email}).then((user)=>{
+      if(!user){
+        return Promise.reject();
+      }
+      return new Promise((resolve,reject) =>{
+        //pass password argument, user.password and callback
+        bcrypt.compare(password, user.password, (err,res)=>{
+          if(res){
+            resolve(user);
+          }else{
+            reject();
+          }
+        });
+      });
+    });
+};
 //salt & hashes password before document is saved.
 //don't forget next argument!!
 UserSchema.pre('save', function(next){
