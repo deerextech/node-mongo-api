@@ -5,6 +5,7 @@ const {ObjectID} = require('mongodb');
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
 const {todos, populateTodos, users, populateUsers} = require('./seed/seed');
+const {User} = require('./../models/user');
 
 beforeEach(populateUsers);
 
@@ -170,6 +171,90 @@ describe('PATCH /todos/:id', ()=>{
       expect(res.body.todo.completedAt).toBe(null);
       expect(res.body.todo.completedAt).toNotExist();
     })
+    .end(done);
+  })
+});
+
+describe('GET /users/me', ()=>{
+  it('should return user if authenticated', (done) =>{
+    //get request. Just needs url
+    //then set header. Takes 2 arg: header name & header values
+    // so I will need x-auth annnnd then go into users array and access token value.
+    request(app)
+    .get('/users/me')
+    .set('x-auth', users[0].tokens[0].token)
+    //now i can make assertions.
+    .expect(200)
+    .expect((res)=>{
+      expect(res.body._id).toBe(users[0]._id.toHexString());
+      expect(res.body.email).toBe(users[0].email);
+    })
+    .end(done);
+
+  });
+  it('should return 401 if not auth', (done)=>{
+    request(app)
+    .get('/users/me')
+    .expect(401)
+    .expect((res)=>{
+      expect(res.body).toEqual({});
+    })
+    .end(done);
+  })
+});
+
+describe('POST /users', () =>{
+  it('should create a user', (done) =>{
+    var username = 'test1';
+    var email = 'testemail@test.com';
+    var password = 'pass1234';
+
+    request(app)
+    .post('/users')
+    .send({username,email,password})
+    .expect(200)
+    .expect((res) =>{
+      expect(res.headers['x-auth']).toExist();
+      expect(res.body._id).toExist();
+      expect(res.body.email).toBe(email);
+      expect(res.body.username).toBe(username);
+    })
+    .end((err) =>{
+      if(err){
+        //if there is an error
+        return done(err);
+      }else{
+        //find user by email that was inserted.
+        User.findOne({email}).then((user)=>{
+          //check if inserted user exists
+          expect(user).toExist();
+          expect(user.username).toEqual(username);
+          //makes sure passwords don't match, because if they do it wasn't hashed.
+          expect(user.password).toNotBe(password);
+          done();
+        })
+      }
+    });
+  });
+  it('should return validation errors if request invalid', (done) =>{
+    var username = ''; //minlength is 5.
+    var password = 'k;slaslkflksda';
+    var email = 'email@email.com'
+    request(app)
+    .post('/users')
+    .send({username,email,password})
+    .expect(400)
+    .end(done);
+  });
+  it('should not create user if email in use', (done) =>{
+
+    request(app)
+    .post('/users')
+    .send({
+      email: users[0].email,
+      password:'jkda;fads'
+    })
+    .expect(400)
     .end(done);
   })
 })
