@@ -9,7 +9,7 @@ const {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
-
+var {authenticate} = require('./middleware/authenticate');
 
 // mongoose.connect('mongodb://localhost:27017/TodoList');
 
@@ -126,6 +126,12 @@ app.post('/users', (req,res)=>{
     res.status(400).send(e);
   })
 });
+
+
+//making private route
+app.get('/users/me', authenticate, (req,res)=>{
+  res.send(req.user);
+})
 
 // app.get('/users', (req, res) =>{
 //   User.find().then((users)=>{

@@ -53,7 +53,7 @@ UserSchema.methods.toJSON = function(){
 UserSchema.methods.generateAuthToken = function(){
   //not using arrow function here for specific reason: arrow functions do not bind 'this' keyword
   // and I need this for this. (haha)
-  var user = this; // referencing self.
+  var user = this; // referencing self. instance methods get called with individual document
   var access = 'auth';
   var token = jwt.sign({_id:user._id.toHexString(), access}, 'MyNameisPrince').toString();
   //now data is generated and need to update users token array.
@@ -68,6 +68,29 @@ UserSchema.methods.generateAuthToken = function(){
    return user.save().then(()=>{
      return token; //server file will have access to token .. it will chain on to this returned promise success.
    })
+}
+
+UserSchema.statics.findByToken = function(token){
+  var User = this; //model method is this binding.
+  var decoded; //undefind. will store values.
+
+  try{
+    decoded = jwt.verify(token,'MyNameisPrince');
+  }catch(e){
+    //if verify fails.
+    return Promise.reject();
+    //vv equiv of writing it like this: 
+    // return new Promise((resolve,reject)=>{
+    //   reject(); //server will reject promise
+    // })
+  }
+  //success case
+ return User.findOne({
+   '_id':decoded._id,
+   'tokens.token':token,
+   'tokens.access':'auth'
+ })
+ //find associated user. Returns promise, and we return that promise.
 }
 
 var User = mongoose.model('User', UserSchema);
