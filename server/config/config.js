@@ -1,12 +1,11 @@
 var env = process.env.NODE_ENV || 'development';
-console.log('ENV *******', env);
 
-if(env === 'development'){
-    process.env.PORT = 3000;
-    process.env.MONGODB_URI ='mongodb://localhost:27017/TodoList';
-}else if(env === 'test'){
-  process.env.PORT = 3000;
-  process.env.MONGODB_URI ='mongodb://localhost:27017/TodoListTest';
+if(env === 'development' || env === 'test'){
+    var config = require('./config.json');
+    //need extention because it's not js extention.
+    var envConfig = config[env]; //accessing variable property with bracket notation
+
+    Object.keys(envConfig).forEach((key)=>{
+      process.env[key] = envConfig[key];
+    })
 }
-
-exports.module = {env};

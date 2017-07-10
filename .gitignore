@@ -1,3 +1,4 @@
 node_modules
 testinggrounds.js
 playground
+server/config/config.json
