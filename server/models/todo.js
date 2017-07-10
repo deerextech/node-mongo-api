@@ -15,6 +15,10 @@ var Todo = mongoose.model('Todo', {
   completedAt:{
     type:Number,
     default: null
+  },
+  _creator:{
+    type: mongoose.Schema.Types.ObjectId,
+    required:true
   }
 });
 
@@ -23,19 +27,19 @@ module.exports = {Todo};
 //
 //
 //
-var newTodoItem = new Todo({
-  text:'New Item',
-  completed:true,
-  completedAt: 0123
-});
+// var newTodoItem = new Todo({
+//   text:'New Item',
+//   completed:true,
+//   completedAt: 0123
+// });
+// //
+// // //save returns promise
+// newTodoItem.save().then((doc)=>{
+//   console.log('Saved todo', doc);
+// },(e)=>{
+//   console.log('unable to save todo', e)
+// });
 //
-// //save returns promise
-newTodoItem.save().then((doc)=>{
-  console.log('Saved todo', doc);
-},(e)=>{
-  console.log('unable to save todo', e)
-});
-
 
 //could or, i guess would move this to another file normally.
 // but, this is an example of an alternative validation for mongoose.
