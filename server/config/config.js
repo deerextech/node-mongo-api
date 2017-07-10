@@ -9,3 +9,5 @@ if(env === 'development' || env === 'test'){
       process.env[key] = envConfig[key];
     })
 }
+//// apparently. PORT and MONGODB_URI must be uppercase in json file or variables will not set.
+// don't forget! 

@@ -59,7 +59,7 @@ UserSchema.methods.generateAuthToken = function(){
   // and I need this for this. (haha)
   var user = this; // referencing self. instance methods get called with individual document
   var access = 'auth';
-  var token = jwt.sign({_id:user._id.toHexString(), access}, 'MyNameisPrince').toString();
+  var token = jwt.sign({_id:user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
   //now data is generated and need to update users token array.
 
   user.tokens.push({
@@ -89,7 +89,7 @@ UserSchema.statics.findByToken = function(token){
   var decoded; //undefind. will store values.
 
   try{
-    decoded = jwt.verify(token,'MyNameisPrince');
+    decoded = jwt.verify(token,process.env.JWT_SECRET);
   }catch(e){
     //if verify fails.
     return Promise.reject();

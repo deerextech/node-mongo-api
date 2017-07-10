@@ -1,4 +1,4 @@
-var {env} = require('./config/config');
+require('./config/config');
 
 const _ = require('lodash');
 
@@ -14,7 +14,7 @@ var {authenticate} = require('./middleware/authenticate');
 // mongoose.connect('mongodb://localhost:27017/TodoList');
 
 var app = express();
-var port = process.env.PORT || env;
+var port = process.env.PORT;
 
 app.use(bodyParser.json());
 
