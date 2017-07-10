@@ -74,6 +74,16 @@ UserSchema.methods.generateAuthToken = function(){
    })
 }
 
+UserSchema.methods.removeToken = function(token){
+  //$pull mongo operator that removes based on criteria
+  var user = this;
+    return user.update({
+    $pull:{
+      tokens:{token}
+    }
+  });
+};
+
 UserSchema.statics.findByToken = function(token){
   var User = this; //model method is this binding.
   var decoded; //undefind. will store values.
